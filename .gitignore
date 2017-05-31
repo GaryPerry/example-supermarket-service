@@ -1,0 +1,14 @@
+# IDE ignores
+.idea
+*.iml
+.settings
+.project
+.classpath
+
+# Build ignores
+.gradle
+build/
+target/
+bin/
+logs/
+classes/
