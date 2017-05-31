@@ -1,0 +1,199 @@
+group 'web.supermarket.ex'
+
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'application'
+apply plugin: 'cobertura'
+
+project.ext {
+    mainClass = "web.supermarket.ex.application.SupermarketServiceApplication"
+
+    javaVersion = '1.8'
+    dropwizardVersion = '0.9.3'
+    swaggerVersion = '0.9.3-3'
+    neo4jVersion = '2.1.1'
+
+    junitVersion = '4.12'
+    hamcrestVersion = '1.3'
+    mockitoVersion = '1.10.19'
+    powerMockVersion = '1.6.5'
+    restAssuredVersion = '3.0.0'
+}
+
+println System.getProperty("java.home")
+
+compileJava {
+    sourceCompatibility = '1.8'
+}
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    jcenter()
+}
+
+buildscript {
+    ext {
+        java = 1.8
+        coberturaVersion = '2.3.2'
+    }
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "net.saliman:gradle-cobertura-plugin:${coberturaVersion}"
+    }
+}
+
+// JAR/FatJAR configuration
+mainClassName = "${mainClass}"
+
+compileJava {
+    sourceCompatibility = "${javaVersion}"
+    targetCompatibility = "${javaVersion}"
+}
+
+task createJar(type: Jar) {
+    // Include all required MANIFEST files from the build dir
+    doFirst {
+        def serviceDir = file("$buildDir/META-INF/services")
+        serviceDir.mkdirs()
+        for (file in configurations.runtime) {
+            zipTree(file).matching { include 'META-INF/services/*' }.each { f ->
+                new File(serviceDir, f.name) << f.getText("UTF-8")
+            }
+        }
+    }
+    // Now build our own manifest and bundle up dependant jars
+    manifest {
+        attributes(
+                "Main-Class": "${mainClass}",
+                "Specification-Title": "Example Supermarket Service",
+                "Specification-Vendor": "Gary Perry"
+        )
+    }
+    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+    from fileTree(buildDir).matching { include 'META-INF/services/*' }
+    with jar
+}
+
+// Test configurations
+sourceSets {
+    unitTest {
+        java {
+            srcDir file('src/test/unit')
+//            compileClasspath += main.output + Test.output
+//            runtimeClasspath += main.output + Test.output
+        }
+    }
+    integrationTest {
+        java {
+//            compileClasspath += main.output + Test.output
+//            runtimeClasspath += main.output + Test.output
+            srcDir file('src/test/integration')
+        }
+    }
+    sanityTest {
+        java {
+//            compileClasspath += main.output + Test.output
+//            runtimeClasspath += main.output + Test.output
+            srcDir file('src/test/sanity')
+        }
+    }
+    regressionTest {
+        java {
+//            compileClasspath += main.output + Test.output
+//            runtimeClasspath += main.output + Test.output
+            srcDir file('src/test/regression')
+        }
+    }
+}
+
+configurations {
+    unitTestCompile.extendsFrom testCompile
+    unitTestRuntime.extendsFrom testRuntime
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+    sanityTestCompile.extendsFrom testCompile
+    sanityTestRuntime.extendsFrom testRuntime
+    regressionTestCompile.extendsFrom testCompile
+    regressionTestRuntime.extendsFrom testRuntime
+}
+
+task unitTest(type: Test) {
+    testClassesDir = sourceSets.unitTest.output.classesDir
+    classpath = sourceSets.unitTest.runtimeClasspath
+    finalizedBy project.tasks.cobertura
+}
+
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+task sanityTest(type: Test) {
+    testClassesDir = sourceSets.sanityTest.output.classesDir
+    classpath = sourceSets.sanityTest.runtimeClasspath
+}
+
+task regressionTest(type: Test) {
+    testClassesDir = sourceSets.regressionTest.output.classesDir
+    classpath = sourceSets.regressionTest.runtimeClasspath
+}
+
+task tests(type: Test) {
+    // If URL is specified then use it when running tests, if not it will default to http://localhost:8080
+    if (project.hasProperty("url")) {
+        url = project.getProperty("url")
+
+        // Read test type parameter and execute if specified, if not, throw exception
+        if (project.hasProperty("type")) {
+            type = project.getProperty("type")
+            if (type == "sanity") {
+                systemProperties = System.getProperties()
+                systemProperties['endpoint'] = url
+                testClassesDir = sourceSets.sanityTest.output.classesDir
+                classpath = sourceSets.sanityTest.runtimeClasspath
+            } else if (type == "regression") {
+                systemProperties = System.getProperties()
+                systemProperties['endpoint'] = url
+                testClassesDir = sourceSets.regressionTest.output.classesDir
+                classpath = sourceSets.regressionTest.runtimeClasspath
+            }
+        } else {
+            throw new GradleException('"type" parameter must be specified [santity, regression]')
+        }
+    }
+}
+
+// Cobertura configuration
+cobertura {
+    coverageReportDir = file("$buildDir/reports")
+    coverageFormats = ['html', 'xml']
+    coverageTestTasks { project.tasks.matching { it.name.contains("unit") } } // only run unit tests
+    coverageCheckBranchRate = 80
+    coverageCheckLineRate = 80
+    coverageCheckPackageBranchRate = 80
+    coverageCheckPackageLineRate = 80
+    coverageCheckTotalBranchRate = 80
+    coverageCheckTotalLineRate = 80
+    coverageExcludes = [
+            '.*uk.co.tandf.journal.application.JournalMetadataApplicationConfiguration.*'
+    ]
+}
+
+task build(dependsOn: ['clean', 'createJar'])
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
+    compile "io.dropwizard:dropwizard-client:${dropwizardVersion}"
+    compile "com.smoketurner:dropwizard-swagger:${swaggerVersion}"
+
+    testCompile "junit:junit:${junitVersion}"
+    testCompile "org.hamcrest:hamcrest-library:${hamcrestVersion}"
+    testCompile "org.mockito:mockito-core:${mockitoVersion}"
+    testCompile "org.powermock:powermock-api-mockito:${powerMockVersion}"
+    testCompile "org.powermock:powermock-module-junit4:${powerMockVersion}"
+    testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
+    testCompile "io.rest-assured:rest-assured:${restAssuredVersion}"
+}

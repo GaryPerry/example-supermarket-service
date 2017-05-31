@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-supermarket-service.iml" filepath="$PROJECT_DIR$/.idea/modules/example-supermarket-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-supermarket-service_integrationTest.iml" filepath="$PROJECT_DIR$/.idea/modules/example-supermarket-service_integrationTest.iml" group="example-supermarket-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-supermarket-service_main.iml" filepath="$PROJECT_DIR$/.idea/modules/example-supermarket-service_main.iml" group="example-supermarket-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-supermarket-service_regressionTest.iml" filepath="$PROJECT_DIR$/.idea/modules/example-supermarket-service_regressionTest.iml" group="example-supermarket-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-supermarket-service_sanityTest.iml" filepath="$PROJECT_DIR$/.idea/modules/example-supermarket-service_sanityTest.iml" group="example-supermarket-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-supermarket-service_test.iml" filepath="$PROJECT_DIR$/.idea/modules/example-supermarket-service_test.iml" group="example-supermarket-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-supermarket-service_unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/example-supermarket-service_unitTest.iml" group="example-supermarket-service" />
+      <module fileurl="file://$PROJECT_DIR$/src/test/unit//example-supermarket-service/unitTests.iml" filepath="$PROJECT_DIR$/src/test/unit//example-supermarket-service/unitTests.iml" group="example-supermarket-service" />
+    </modules>
+  </component>
+</project>

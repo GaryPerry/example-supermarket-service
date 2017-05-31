@@ -1,0 +1,3 @@
+org.glassfish.jersey.server.wadl.internal.WadlAutoDiscoverable
+org.glassfish.jersey.server.internal.monitoring.MonitoringAutodiscoverableorg.glassfish.jersey.spidiscovery.internal.MetaInfServicesAutoDiscoverable
+org.glassfish.jersey.server.validation.internal.ValidationAutoDiscoverableorg.glassfish.jersey.jaxb.internal.JaxbAutoDiscoverable
